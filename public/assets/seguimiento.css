@@ -1,0 +1,40 @@
+
+.tracking {color:#1d334b;font-size:16px;line-height:1.55;overflow-wrap:anywhere}
+.tracking .page-head h1 {font-size:clamp(26px,2.2vw,34px);line-height:1.2}
+.tracking .page-head p,.tracking .notice,.tracking .feedback,.tracking .member-info strong {font-size:16px}
+.tracking h2 {font-size:21px;line-height:1.3}
+.tracking .relation h3 {font-size:18px;line-height:1.35}
+.tracking .small,.tracking .dates,.tracking .back,.tracking .member-info small,.tracking .agenda-item small {font-size:14px}
+.tracking .btn,.tracking .agenda-item button {font-size:15px}
+.tracking .pill {font-size:13px;white-space:normal}
+.tracking .muted,.tracking .member-info small {color:#52647a}
+.tracking .card {min-width:0;padding:clamp(17px,2vw,26px);border:1px solid #d7e0ea;border-radius:12px;background:white}
+.tracking .relation {padding:16px 18px;border:1px solid #dce5ee;border-radius:9px}
+.tracking .relation .dates {display:flex;gap:6px 20px;flex-wrap:wrap;color:#344f69}
+.tracking .feedback strong {display:block;margin-bottom:3px}
+.tracking .notice strong {font-size:17px}
+.tracking .track-stages {list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:20px 0;padding:6px;background:#fff;border:1px solid #d7e0ea;border-radius:13px}
+.track-stages li {display:flex;align-items:center;gap:10px;padding:11px 12px;color:#435970;border-radius:8px}
+.track-stages strong,.track-stages small {display:block}
+.track-stages strong {font-size:16px;line-height:1.3}
+.track-stages small {font-size:13px}
+.track-stages .stage-marker {display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:50%;background:#edf1f5;font-weight:700}
+.track-stages .stage-marker svg {width:17px;height:17px}
+.track-stages .done .stage-marker {background:#dcefe9;color:#176047}
+.track-stages .current {background:#eaf1fd;color:#123f86}
+.track-stages .current .stage-marker {background:#164baa;color:white}
+.track-dates {margin:0 0 13px;display:grid;gap:10px}
+.track-dates div {padding:9px 12px;background:#f2f5fa;border-radius:6px}
+.track-dates dt {font-size:14px;color:#52647a}
+.track-dates dd {margin:1px 0 0;font-size:17px;font-weight:650}
+.tracking .grid-2 {grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr)}
+.tracking .stack {min-width:0}
+@media(max-width:980px){
+  .tracking .track-stages {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tracking .grid-2 {grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:480px){
+  .track-stages li {gap:6px;padding:8px 5px}
+  .track-stages strong {font-size:15px}
+  .track-stages .stage-marker {width:25px;height:25px}
+}

@@ -1,0 +1,17 @@
+# ProyectoAcademicoDesarrollo — requisitos para Windows
+# Este proyecto está hecho en PHP. NO ejecutar: pip install -r requirements.txt.
+# Instalar los programas siguientes desde sus sitios oficiales.
+
+# PHP CLI 8.x, preferiblemente la misma versión mayor/menor usada por el equipo.
+# Extensiones PHP habilitadas: PDO y pdo_pgsql.
+# PostgreSQL Server y cliente psql; preferiblemente la misma versión mayor que en Fedora.
+# Navegador moderno para HTML, CSS y JavaScript ES modules.
+# Visual Studio Code es opcional para editar; pgAdmin es opcional.
+
+# Dependencias Composer: comprobar composer.json del proyecto real.
+# Si existe composer.json, instalar Composer y ejecutar composer install.
+# El paquete frontend de demostración recibido no requería paquetes externos.
+
+# Configuración propia: config/local.php (o .env si el proyecto real lo utiliza).
+# BD local prevista: 127.0.0.1:5432 / proyecto_academico / proyecto_app.
+# La contraseña se configura localmente y nunca se guarda en este archivo.

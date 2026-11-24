@@ -1,0 +1,31 @@
+# Configuración privada y sus copias locales
+/config/local.php
+/config/local.*.php
+!/config/local.example.php
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Credenciales y claves privadas
+.aws/
+.ssh/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Registros y respaldos de ejecución
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/sessions/
+/database/backups/
+/database/dumps/
+*.dump
+*.backup
+
+# Copias del editor que pueden contener configuración privada
+*.bak
+*.swp
+*.swo
+*~

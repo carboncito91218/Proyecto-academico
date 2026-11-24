@@ -1,0 +1,9 @@
+
+.verification{padding:12px 0;border-bottom:1px solid #dae3ee}.verification p{font-size:14px;margin:4px 0 9px}.verification select{font:inherit;padding:5px;border:1px solid #acbdcf;border-radius:5px}
+.priority{display:inline-block;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:650;margin:3px 6px 3px 0;color:#244975;background:#e6eef9}.priority[data-level="Crítica"]{background:#ffe6df;color:#842f27}.priority[data-level="Importante"]{background:#fff0c9;color:#6e4700}.pill.caducada{background:#e7e4ed;color:#49395c}
+
+.live-session :is(#academicProfile, #profile, label[for="profile"], [data-action="scenarios"]) { display: none !important; }
+
+.live-session.development-session :is(#academicProfile, #profile, label[for="profile"]) { display: inline-block !important; }
+
+.live-session.development-session #academicProfile[hidden] { display: none !important; }

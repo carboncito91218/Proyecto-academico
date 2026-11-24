@@ -1,0 +1,349 @@
+{
+  "version": 1,
+  "profile": "s1",
+  "date": "2026-11-10",
+  "collapsed": false,
+  "rubrics": [
+    {
+      "id": "r1",
+      "title": "Desarrollo de una solución web",
+      "course": "c1",
+      "teacher": "t1",
+      "deadline": "2026-11-30",
+      "criteria": "Una solución funcional y pertinente al problema.\nJustificación de las decisiones de desarrollo.\nDemostración del recorrido principal.",
+      "competencies": [
+        "Una solución funcional y pertinente al problema.",
+        "Justificación de las decisiones de desarrollo.",
+        "Demostración del recorrido principal."
+      ],
+      "competencyIds": [
+        "r1-c1",
+        "r1-c2",
+        "r1-c3"
+      ]
+    },
+    {
+      "id": "r2",
+      "title": "Modelo de datos del proyecto",
+      "course": "c2",
+      "teacher": "t2",
+      "deadline": "2026-11-30",
+      "criteria": "Entidades y relaciones coherentes con el negocio.\nReglas de integridad justificadas.\nCorrespondencia con la propuesta.",
+      "competencies": [
+        "Entidades y relaciones coherentes con el negocio.",
+        "Reglas de integridad justificadas.",
+        "Correspondencia con la propuesta."
+      ],
+      "competencyIds": [
+        "r2-c1",
+        "r2-c2",
+        "r2-c3"
+      ]
+    },
+    {
+      "id": "r3",
+      "title": "Diseño de la experiencia",
+      "course": "c3",
+      "teacher": "t3",
+      "deadline": "2026-11-30",
+      "criteria": "Recorrido del usuario claro y comprensible.\nNavegación coherente entre pantallas.\nValidaciones y mensajes que orienten al usuario.",
+      "competencies": [
+        "Recorrido del usuario claro y comprensible.",
+        "Navegación coherente entre pantallas.",
+        "Validaciones y mensajes que orienten al usuario."
+      ],
+      "competencyIds": [
+        "r3-c1",
+        "r3-c2",
+        "r3-c3"
+      ]
+    }
+  ],
+  "proposals": [
+    {
+      "id": "p1",
+      "title": "EcoCampus ISUR",
+      "description": "Una plataforma para registrar iniciativas de ahorro de agua y energía dentro del instituto. El equipo desarrollará una solución web con un modelo de datos coherente y un recorrido de usuario claro. Una misma propuesta permite coordinar el trabajo de los tres cursos.",
+      "leader": "s1",
+      "members": [
+        "s1",
+        "s2"
+      ],
+      "draft": false,
+      "sent": "2026-11-10",
+      "born": true,
+      "confirmed": null,
+      "relations": [
+        {
+          "rubric": "r1",
+          "decision": "APROBADA",
+          "feedback": "",
+          "start": "2026-11-16",
+          "end": "2026-12-18",
+          "withdrawn": false,
+          "cancelled": false,
+          "evaluated": false,
+          "checked": [],
+          "history": [],
+          "observations": 0,
+          "verification": {
+            "r1-c1": "CUMPLE",
+            "r1-c2": "CUMPLE",
+            "r1-c3": "CUMPLE"
+          },
+          "evidence": {
+            "r1-c1": "Registraremos las iniciativas del campus.",
+            "r1-c2": "Validaremos los datos de cada iniciativa.",
+            "r1-c3": "Probaremos el recorrido con el equipo."
+          },
+          "id": "p1-r1"
+        },
+        {
+          "rubric": "r2",
+          "decision": "APROBADA",
+          "feedback": "",
+          "start": "2026-11-19",
+          "end": "2026-12-20",
+          "withdrawn": false,
+          "cancelled": false,
+          "evaluated": false,
+          "checked": [],
+          "history": [],
+          "observations": 0,
+          "verification": {
+            "r2-c1": "CUMPLE",
+            "r2-c2": "CUMPLE",
+            "r2-c3": "CUMPLE"
+          },
+          "evidence": {
+            "r2-c1": "Registraremos las iniciativas del campus.",
+            "r2-c2": "Validaremos los datos de cada iniciativa.",
+            "r2-c3": "Probaremos el recorrido con el equipo."
+          },
+          "id": "p1-r2"
+        },
+        {
+          "rubric": "r3",
+          "decision": "PENDIENTE",
+          "feedback": "",
+          "start": "",
+          "end": "",
+          "withdrawn": false,
+          "cancelled": false,
+          "evaluated": false,
+          "checked": [],
+          "history": [],
+          "observations": 0,
+          "verification": {},
+          "evidence": {
+            "r3-c1": "Registraremos las iniciativas del campus.",
+            "r3-c2": "Validaremos los datos de cada iniciativa.",
+            "r3-c3": "Probaremos el recorrido con el equipo."
+          },
+          "id": "p1-r3"
+        }
+      ],
+      "deliverables": [
+        {
+          "title": "Modelo de datos y validaciones",
+          "date": "2026-11-24",
+          "rubric": "r2"
+        },
+        {
+          "title": "Demostración del proyecto",
+          "date": "2026-12-15",
+          "rubric": "r1"
+        }
+      ]
+    },
+    {
+      "id": "p-library",
+      "title": "Reservas de biblioteca",
+      "description": "El equipo propone una aplicación para reservar salas de estudio y consultar su disponibilidad. El modelo de datos evita dos reservas simultáneas para la misma sala.",
+      "leader": "s1",
+      "members": [
+        "s1",
+        "s2"
+      ],
+      "draft": false,
+      "sent": "2026-11-08",
+      "born": false,
+      "confirmed": null,
+      "deliverables": [],
+      "relations": [
+        {
+          "rubric": "r1",
+          "decision": "OBSERVADA",
+          "feedback": "Añadan un ejemplo de cómo se resolverían dos solicitudes para la misma sala.",
+          "start": "",
+          "end": "",
+          "due": "2026-11-15",
+          "checked": [
+            0
+          ],
+          "history": [
+            {
+              "label": "Observada",
+              "date": "2026-11-09",
+              "note": "Añadan un ejemplo de cómo se resolverían dos solicitudes para la misma sala."
+            }
+          ],
+          "withdrawn": false,
+          "cancelled": false,
+          "evaluated": false,
+          "observations": 1,
+          "verification": {
+            "0": "CUMPLE",
+            "r1-c1": "CUMPLE",
+            "r1-c2": "NO_CUMPLE",
+            "r1-c3": "CUMPLE"
+          },
+          "evidence": {
+            "r1-c1": "Mostraremos el flujo de reserva de una sala.",
+            "r1-c2": "Documentaremos las decisiones con ejemplos de reservas.",
+            "r1-c3": "Prepararemos una demostración con horarios de prueba."
+          },
+          "id": "p-library-r1"
+        },
+        {
+          "rubric": "r2",
+          "decision": "PENDIENTE",
+          "feedback": "",
+          "start": "",
+          "end": "",
+          "due": "2026-11-15",
+          "checked": [],
+          "history": [],
+          "withdrawn": false,
+          "cancelled": false,
+          "evaluated": false,
+          "observations": 0,
+          "verification": {},
+          "evidence": {
+            "r2-c1": "Mostraremos el flujo de reserva de una sala.",
+            "r2-c2": "Documentaremos las decisiones con ejemplos de reservas.",
+            "r2-c3": "Prepararemos una demostración con horarios de prueba."
+          },
+          "id": "p-library-r2"
+        },
+        {
+          "rubric": "r3",
+          "decision": "PENDIENTE",
+          "feedback": "",
+          "start": "",
+          "end": "",
+          "due": "2026-11-15",
+          "checked": [],
+          "history": [],
+          "withdrawn": false,
+          "cancelled": false,
+          "evaluated": false,
+          "observations": 0,
+          "verification": {},
+          "evidence": {
+            "r3-c1": "Mostraremos el flujo de reserva de una sala.",
+            "r3-c2": "Documentaremos las decisiones con ejemplos de reservas.",
+            "r3-c3": "Prepararemos una demostración con horarios de prueba."
+          },
+          "id": "p-library-r3"
+        }
+      ]
+    }
+  ],
+  "academicUpgrade": true,
+  "activity": [
+    {
+      "key": "actividad-0",
+      "title": "Propuesta enviada",
+      "detail": "EcoCampus ISUR · Desarrollo de una solución web",
+      "to": [
+        "t1"
+      ],
+      "pid": "p1",
+      "rid": "r1"
+    },
+    {
+      "key": "actividad-1",
+      "title": "Rúbrica aprobada",
+      "detail": "EcoCampus ISUR · Desarrollo de una solución web",
+      "to": [
+        "s1",
+        "s2"
+      ],
+      "pid": "p1",
+      "rid": "r1"
+    },
+    {
+      "key": "actividad-2",
+      "title": "Propuesta enviada",
+      "detail": "EcoCampus ISUR · Modelo de datos del proyecto",
+      "to": [
+        "t2"
+      ],
+      "pid": "p1",
+      "rid": "r2"
+    },
+    {
+      "key": "actividad-3",
+      "title": "Rúbrica aprobada",
+      "detail": "EcoCampus ISUR · Modelo de datos del proyecto",
+      "to": [
+        "s1",
+        "s2"
+      ],
+      "pid": "p1",
+      "rid": "r2"
+    },
+    {
+      "key": "actividad-4",
+      "title": "Propuesta enviada",
+      "detail": "EcoCampus ISUR · Diseño de la experiencia",
+      "to": [
+        "t3"
+      ],
+      "pid": "p1",
+      "rid": "r3"
+    },
+    {
+      "key": "actividad-5",
+      "title": "Propuesta enviada",
+      "detail": "Reservas de biblioteca · Desarrollo de una solución web",
+      "to": [
+        "t1"
+      ],
+      "pid": "p-library",
+      "rid": "r1"
+    },
+    {
+      "key": "actividad-6",
+      "title": "Rúbrica observada",
+      "detail": "Reservas de biblioteca · Desarrollo de una solución web",
+      "to": [
+        "s1",
+        "s2"
+      ],
+      "pid": "p-library",
+      "rid": "r1"
+    },
+    {
+      "key": "actividad-7",
+      "title": "Propuesta enviada",
+      "detail": "Reservas de biblioteca · Modelo de datos del proyecto",
+      "to": [
+        "t2"
+      ],
+      "pid": "p-library",
+      "rid": "r2"
+    },
+    {
+      "key": "actividad-8",
+      "title": "Propuesta enviada",
+      "detail": "Reservas de biblioteca · Diseño de la experiencia",
+      "to": [
+        "t3"
+      ],
+      "pid": "p-library",
+      "rid": "r3"
+    }
+  ]
+}

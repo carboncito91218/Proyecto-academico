@@ -1,0 +1,80 @@
+{
+  "students": [
+    {
+      "id": "s1",
+      "name": "Estudiante 01",
+      "courses": [
+        "c1",
+        "c2"
+      ],
+      "program": "Desarrollo de Sistemas de Información"
+    },
+    {
+      "id": "s2",
+      "name": "Estudiante 02",
+      "courses": [
+        "c2",
+        "c3"
+      ],
+      "program": "Desarrollo de Sistemas de Información"
+    },
+    {
+      "id": "s3",
+      "name": "Estudiante 03",
+      "courses": [
+        "c1"
+      ],
+      "program": "Desarrollo de Sistemas de Información"
+    },
+    {
+      "id": "s4",
+      "name": "Estudiante 04",
+      "courses": [
+        "c1"
+      ],
+      "program": "Administración"
+    },
+    {
+      "id": "s5",
+      "name": "Estudiante 05",
+      "courses": [
+        "c2"
+      ],
+      "program": "Desarrollo de Sistemas de Información",
+      "year": "2025"
+    }
+  ],
+  "teachers": [
+    {
+      "id": "t1",
+      "name": "Profesor A"
+    },
+    {
+      "id": "t2",
+      "name": "Profesor B"
+    },
+    {
+      "id": "t3",
+      "name": "Profesor C"
+    }
+  ],
+  "courses": [
+    {
+      "id": "c1",
+      "name": "Programación web"
+    },
+    {
+      "id": "c2",
+      "name": "Base de datos"
+    },
+    {
+      "id": "c3",
+      "name": "Diseño de interfaces"
+    }
+  ],
+  "periodo": {
+    "inicio": "2026-08-17",
+    "caducidad": "2026-12-04",
+    "limiteNotas": "2026-12-22"
+  }
+}
