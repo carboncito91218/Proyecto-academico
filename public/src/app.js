@@ -1,5 +1,5 @@
 import { screen } from './ui.js';
-import { execute, read } from './data/adapter.js';
+import { execute, read, candidates } from './data/adapter.js';
 import { setSnapshot } from './model.js';
 let toastTimer, lastFocus;
 import { visibleProject, db, periodo, daysAfter, terminal, rubricOpen, closedReview, editableProposal, eligibleMember, student, teacher, course, rubric, proposal, isTeacher, current, own, active, projectRubrics, proposalState, projectState, started, visible, fmt, relFor, receivedRubric } from "./model.js";
@@ -61,7 +61,7 @@ function toast(msg, error = false) {
     toastTimer = setTimeout(() => $('#toastRoot').innerHTML = '', 5000);
 }
 async function nav(dest) {
-    if (db.demo === false && dest === 'rubrics') {
+    if (db.demo === false && ['rubrics', 'proposals', 'received', 'projects', 'detail', 'review', 'project'].includes(dest.split('/')[0])) {
         try { setSnapshot(await read()); }
         catch (error) { toast(error.message, true); return; }
     }
@@ -76,12 +76,9 @@ async function nav(dest) {
 }
 function render() {
     document.body.classList.toggle('live-session', db.demo === false);
-    document.body.classList.toggle('development-session', !!db.profileOptions?.length);
+    document.body.classList.remove('development-session');
     if (db.demo === false) {
-        for (const selector of ['#profile', '#academicProfile']) {
-            $(selector).innerHTML = (db.profileOptions?.length ? db.profileOptions : [current()]).map(p => `<option value="${esc(p.id)}">${esc(p.name)} · ${esc(p.role || (isTeacher() ? 'profesor' : 'alumno'))}</option>`).join('');
-        }
-        selected = selected.filter(id => db.rubrics.some(r => r.id === id && rubricOpen(r)));
+        if (!editing) selected = selected.filter(id => db.rubrics.some(r => r.id === id && rubricOpen(r)));
     }
     updateFacultyShell();
     document.body.classList.toggle('faculty', isTeacher() || route.startsWith('project/'));
@@ -98,8 +95,8 @@ function render() {
     const view = route.split('/')[0];
     updateNavigation(view);
     let html = '';
-    if (db.demo === false && ['proposals', 'form', 'detail', 'received', 'review', 'projects', 'project', 'agenda', 'assistant'].includes(view))
-        html = empty('Disponible en los siguientes pasos', 'La selección de rúbricas se conserva mientras consultas el catálogo. La gestión de propuestas y proyectos se conectará después.') + btn('Volver a rúbricas', 'nav', 'rubrics', 'primary');
+    if (db.demo === false && ['project', 'agenda', 'assistant'].includes(view))
+        html = empty('Disponible en los siguientes pasos', 'La confirmación y el seguimiento completo del proyecto se habilitarán en el paso 4.') + btn('Volver a rúbricas', 'nav', 'rubrics', 'primary');
     else if (view === 'agenda')
         html = agendaView();
     else if (view === 'assistant')
@@ -204,7 +201,7 @@ function updateFacultyShell() {
     if (!on)
         document.body.classList.remove('mobile-open');
     $('#facultyProduct').hidden = !on;
-    $('#academicProfile').hidden = !on;
+    $('#academicProfile').hidden = !on || db.demo === false;
     $('#academicProfile').value = db.profile;
 }
 function setDrawer(open) {
@@ -232,7 +229,7 @@ function academicAlerts() {
     for (const n of (db.activity || []).filter(n => n.to.includes(db.profile)).slice().reverse()) {
         alerts.push({ ...n, action: isTeacher() ? 'review-open' : 'detail-open', id: isTeacher() ? n.pid + '|' + n.rid : n.pid });
     }
-    for (const e of calendarEvents()) {
+    for (const e of (db.demo === false ? [] : calendarEvents())) {
         if ((e.day >= db.date && e.day <= daysAfter(db.date, 3)) || (e.day < db.date && e.title.startsWith('Plazo de revisión')))
             alerts.push({
                 key: JSON.stringify([e.day, e.title, e.id]),
@@ -294,7 +291,7 @@ function renderRail() {
     panel.innerHTML = `<div class="rail-head"><strong>Panel académico</strong>${toolButton('rail-close', 'Cerrar panel', 'close')}</div>
     ${peopleBlock()}
     <section><h2>Gestión del proyecto</h2>${shortcut('rubrics', isTeacher() ? 'Mis rúbricas' : 'Rúbricas disponibles', 'rubric', 'orange')}${shortcut(isTeacher() ? 'received' : 'proposals', isTeacher() ? 'Propuestas recibidas' : 'Mis propuestas', 'proposal', 'gold')}${shortcut('projects', 'Seguimiento', 'project', 'purple')}</section>
-    <section><h2>Calendario</h2><div id="railCalendar">${calendarMarkup()}</div></section>`;
+    ${db.demo === false ? '' : `<section><h2>Calendario</h2><div id="railCalendar">${calendarMarkup()}</div></section>`}`;
 }
 function applyCalendar(action, id) {
     if (action === 'cal-day')
@@ -390,9 +387,9 @@ function openDecision(id, rid, decision) {
 }
 function withdraw(id, rid) {
     const p = proposal(id), rel = p && relFor(p, rid);
-    if (!p || !own(p) || started(p) || !rel || !terminal(rel) || active(p).length <= 2 || proposalState(p) === 'RECHAZADA')
+    if (!p || !own(p) || started(p) || !rel || !terminal(rel) || active(p).length <= 2 || (db.demo !== false && proposalState(p) === 'RECHAZADA'))
         return toast('No puedes retirar esta rúbrica. Deben quedar al menos dos.', true);
-    showModal('Retirar rúbrica', `<p>${esc(rubric(rid).title)} dejará de formar parte de esta propuesta. Se conservarán las otras ${active(p).length - 1} rúbricas.</p>`, btn('Volver', 'close-modal') + btn('Retirar rúbrica', 'withdraw-confirm', id + '|' + rid, 'orange'));
+    showModal('Retirar rúbrica', `<div id="modalError" class="error-box notice danger" role="alert"></div><p>${esc(rubric(rid).title)} dejará de formar parte de esta propuesta. Se conservarán las otras ${active(p).length - 1} rúbricas.</p>`, btn('Volver', 'close-modal') + btn('Retirar rúbrica', 'withdraw-confirm', id + '|' + rid, 'orange'));
 }
 function projectAction(id, rid, action) {
     const p = proposal(id), rel = p && relFor(p, rid);
@@ -429,6 +426,13 @@ document.addEventListener('click', async (e) => {
     const a = el.dataset.action, id = el.dataset.id || '', parts = id.split('|');
     if (el.closest('#profileMenu'))
         $('#profileMenu').open = false;
+    if (a === 'logout') {
+        try {
+            await execute('logout', {});
+            window.location.replace('./login.html');
+        } catch (error) { toast(error.message, true); }
+        return;
+    }
     if (a === 'chat-prompt')
         chatReply(id);
     else if (a === 'nav')
@@ -451,15 +455,12 @@ document.addEventListener('click', async (e) => {
     else if (a === 'new-proposal') {
         if (isTeacher())
             return;
-        if (db.demo === false) {
-            showModal('Rúbricas seleccionadas', `<p>Conservamos tu selección en esta pantalla. La creación de propuestas se conectará en el paso 3.</p><ul>${selected.map(id => `<li>${esc(rubric(id).title)}</li>`).join('')}</ul>`, btn('Volver al catálogo', 'close-modal'));
-            return;
-        }
         if (!eligibleMember(current(), db.profile, selected))
             return toast('Elige al menos una rúbrica de un curso en el que estés matriculado.', true);
         editing = null;
         formMembers = [db.profile];
-        nav('form');
+        try { await loadCandidates(selected); await nav('form'); }
+        catch (error) { toast(error.message, true); }
     }
     else if (a === 'save-proposal')
         saveProposal(id);
@@ -476,7 +477,8 @@ document.addEventListener('click', async (e) => {
         editing = id;
         selected = active(p).map(rel => rel.rubric);
         formMembers = [...p.members];
-        nav('form');
+        try { await loadCandidates(selected); await nav('form'); }
+        catch (error) { toast(error.message, true); }
     }
     else if (a === 'decide')
         openDecision(...parts);
@@ -538,12 +540,18 @@ document.addEventListener('click', async (e) => {
     else
         academicTool(a, id);
 });
-document.addEventListener('change', e => {
+document.addEventListener('change', async e => {
     if (e.target.dataset.draftRubric) {
         const title = $('#proposalTitle').value, description = $('#proposalDescription').value;
         const proof = [...document.querySelectorAll('[data-evidence]')].map(f => [f.dataset.evidence, f.dataset.index, f.value]);
         const chosen = e.target.dataset.draftRubric;
         selected = e.target.checked ? [...new Set([...selected, chosen])] : selected.filter(id => id !== chosen);
+        if (db.demo === false && selected.length) {
+            document.body.inert = true;
+            try { await loadCandidates(selected); }
+            catch (error) { toast(error.message, true); }
+            finally { document.body.inert = false; }
+        }
         const removed = formMembers.filter(id => id !== db.profile && !eligibleMember(student(id), db.profile, selected));
         formMembers = formMembers.filter(id => !removed.includes(id));
         render();
@@ -567,7 +575,7 @@ document.addEventListener('change', e => {
     if (e.target.dataset.checkRubric) {
         const p = proposal(e.target.dataset.checkProposal), r = rubric(e.target.dataset.checkRubric), rel = p && r && relFor(p, r.id);
         if (rel && !p.draft && isTeacher() && r.teacher === db.profile && !rel.withdrawn && !closedReview(p, rel)) {
-            change('review', { pid: p.id, linkId: rel.id, competencyId: e.target.dataset.index, value: e.target.value }, '', false);
+            change('review', { pid: p.id, version: p.version, linkId: rel.id, competencyId: e.target.dataset.index, value: e.target.value }, '', false);
         }
         return;
     }
@@ -694,8 +702,8 @@ async function change(operation, input, message = '', refresh = true) {
             closeModal();
             render();
         }
-        if (message)
-            toast(message);
+        if (message || response.warnings?.length)
+            toast([message, ...(response.warnings || [])].filter(Boolean).join(' '));
         return response;
     }
     catch (error) {
@@ -706,8 +714,17 @@ async function change(operation, input, message = '', refresh = true) {
         }
         else
             toast(error.message, true);
-        if (operation === 'review' && input.competencyId)
+        if (error.status === 409) {
+            const reload = document.createElement('button');
+            reload.className = 'btn secondary';
+            reload.textContent = 'Recargar datos';
+            reload.onclick = () => window.location.reload();
+            (box || $('#main')).append(reload);
+        }
+        if (operation === 'review' && input.competencyId) {
+            try { setSnapshot(await read()); } catch (_) { /* El error original permanece visible. */ }
             render();
+        }
     }
     finally {
         busy = false;
@@ -724,7 +741,7 @@ function clearSelection() {
     listRubric = '';
 }
 async function switchProfile(id) {
-    if (db.demo === false && !db.profileOptions?.length)
+    if (db.demo === false)
         return;
     if (await change('profile', id, '', false)) {
         clearSelection();
@@ -749,6 +766,7 @@ async function saveProposal(mode) {
     }
     const response = await change('saveProposal', {
         id: editing,
+        version: proposal(editing)?.version,
         mode,
         title: value('#proposalTitle'),
         description: value('#proposalDescription'),
@@ -764,6 +782,7 @@ async function saveProposal(mode) {
 function saveDecision(pid, rid, decision) {
     return change('review', {
         pid,
+        version: proposal(pid)?.version,
         linkId: relFor(proposal(pid), rid).id,
         decision,
         start: value('#decisionStart'),
@@ -786,4 +805,13 @@ function saveRubric(id) {
 }
 function confirmStart(pid) {
     return change('projectAction', { pid, action: 'confirm' }, 'Inicio confirmado.');
+}
+
+async function loadCandidates(ids) {
+    if (db.demo !== false || !ids.length) return;
+    const people = await candidates(ids, editing);
+    const visibleIds = new Set([db.profile, ...formMembers, ...db.proposals.flatMap(p => p.members)]);
+    const merged = new Map(db.students.filter(s => visibleIds.has(s.id)).map(s => [s.id, s]));
+    for (const person of people) merged.set(person.id, person);
+    db.students = [...merged.values()];
 }

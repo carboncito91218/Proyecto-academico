@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Iniciar sesión · Instituto del Sur</title>
+  <link rel="stylesheet" href="./assets/login.css">
+  <script src="./src/login.js" defer></script>
+</head>
+<body data-mode="live">
+  <main class="login">
+    <form id="loginForm" novalidate>
+      <img src="./assets/isur.png" width="112" height="39" alt="Instituto del Sur">
+      <h1>Iniciar sesión</h1>
+      <p id="accountError" role="alert"></p>
+      <label for="account">Correo institucional</label>
+      <input id="account" type="text" inputmode="email" autocomplete="username"
+             autocapitalize="none" spellcheck="false" required autofocus
+             aria-describedby="accountError" placeholder="usuario@isur.edu.pe">
+      <button type="submit">Siguiente</button>
+    </form>
+    <details id="accountOptions">
+      <summary>Opciones de inicio de sesión</summary>
+      <p>Ingresa con el correo institucional de tu cuenta de demostración. Las cuentas disponibles y la configuración de su clave se indican en el README del proyecto.</p>
+    </details>
+    <form id="passwordForm" hidden novalidate autocomplete="on">
+      <img src="./assets/isur.png" width="112" height="39" alt="Instituto del Sur">
+      <button type="button" id="changeAccount" aria-label="Volver y cambiar el correo">
+        <span aria-hidden="true">←</span> <span id="selectedAccount"></span>
+      </button>
+      <h1>Escribir contraseña</h1>
+      <p id="passwordError" role="alert"></p>
+      <input id="password" type="password" aria-label="Contraseña"
+             placeholder="Contraseña" required autocomplete="current-password" aria-describedby="passwordError">
+      <button type="submit">Iniciar sesión</button>
+    </form>
+  </main>
+</body>
+</html>

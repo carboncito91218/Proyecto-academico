@@ -12,7 +12,7 @@ function terminal(rel) {
     return ['RECHAZADA', 'CADUCADA'].includes(rel?.decision);
 }
 function closedReview(p, rel) {
-    return rel.cancelled || projectState(p) === 'CANCELADO' || terminal(rel) || started(p) || rel.decision === 'OBSERVADA' || db.date >= periodo.caducidad;
+    return p.status === 'RECHAZADA' || rel.withdrawn || rel.cancelled || projectState(p) === 'CANCELADO' || terminal(rel) || started(p) || rel.decision === 'OBSERVADA' || db.date >= periodo.caducidad;
 }
 function hasObservation(p) {
     return active(p).some(r => r.decision === 'OBSERVADA');
@@ -65,7 +65,7 @@ function projectState(p) {
     return 'EN_EVALUACION';
 }
 const started = p => p.confirmed && ['EN_EJECUCION', 'EN_EVALUACION', 'FINALIZADO', 'CANCELADO'].includes(projectState(p));
-const visible = p => isTeacher() ? active(p).some(r => rubric(r.rubric)?.teacher === db.profile) && !p.draft : p.members.includes(db.profile);
+const visible = p => isTeacher() ? p.relations.some(r => rubric(r.rubric)?.teacher === db.profile) && !p.draft : p.members.includes(db.profile);
 const visibleProject = p => p.born && approved(p).length >= 2 && (isTeacher() ? approved(p).some(r => rubric(r.rubric)?.teacher === db.profile) : p.members.includes(db.profile));
 const labels = {
     CADUCADA: 'Caducada',

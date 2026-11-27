@@ -12,7 +12,7 @@ function rubricsView() {
         count: rs.length,
         filterLabel: mine ? 'en tu espacio' : 'con plazo vigente',
         rubrics: rs.length ? `<div class="rubric-grid">${rs.map(r => `<article class="rubric-card ${selected.includes(r.id) ? 'selected' : ''}"><div class="row"><span class="course-tag">${esc(course(r.course).name)}</span>${mine ? pill(rubricOpen(r) ? 'ENVIADA' : 'BORRADOR').replace('Enviada', 'Abierta').replace('Borrador', 'Vencida') : icon('rubric')}</div><h3>${esc(r.title)}</h3><div class="rubric-meta"><span>${icon('users')} ${esc(teacher(r.teacher).name)}</span><span>${icon('calendar')} Hasta el ${fmt(r.deadline)}</span></div><div><div class="label" style="margin-bottom:7px">Criterios de la rúbrica</div><div class="criteria">${esc(r.criteria)}</div></div><details><summary>Competencias</summary><ul>${r.competencies.map(c => `<li>${esc(c)}</li>`).join('')}</ul></details><div style="margin-top:auto">${mine ? btn(receivedRubric(r.id) ? 'Consultar / extender plazo' : 'Editar rúbrica', 'rubric-edit', r.id, 'block secondary') : btn(selected.includes(r.id) ? 'Seleccionada' : 'Seleccionar rúbrica', 'select-rubric', r.id, selected.includes(r.id) ? 'block primary' : 'block secondary')}</div></article>`).join('')}</div>` : empty('No hay rúbricas disponibles', 'Prueba otro curso o revisa los plazos de recepción.'),
-        selection: !mine ? `<div class="selection-bar"><div><strong>${selected.length} rúbricas seleccionadas</strong><p>El equipo debe cubrir la matrícula de cada curso.</p></div>${btn('Preparar propuesta', 'new-proposal', '', 'primary', selected.length < 2)}${selected.length < 2 ? '<small>Selecciona al menos dos rúbricas para continuar.</small>' : ''}</div>` : ''
+        selection: !mine ? `<div class="selection-bar"><div><strong>${selected.length} rúbricas seleccionadas</strong><p>El equipo debe cubrir la matrícula de cada curso.</p></div>${btn('Preparar propuesta', 'new-proposal', '', 'primary', selected.length < 1)}${selected.length < 1 ? '<small>Selecciona al menos una rúbrica para preparar un borrador.</small>' : ''}</div>` : ''
     });
 }
 function proposalsView() {
@@ -64,12 +64,12 @@ function detailView(id) {
         description: esc(p.description) || 'Todavía no hay descripción.',
         responses: responses(p),
         total: active(p).length,
-        decisions: active(p).map(r => relationHTML(p, r, true)).join(''),
+        decisions: p.relations.map(r => relationHTML(p, r, true)).join(''),
         teamIcon: icon('users'),
         members: membersHTML(p),
-        status: ps === 'APROBADA' ? note('Propuesta aprobada', hasObservation(p) ? 'Hay una observación por subsanar antes de confirmar.' : responses(p) < active(p).length ? 'Ya hay dos aprobaciones, pero falta la respuesta de todos los profesores.' : 'Todas las respuestas están registradas. El líder puede revisar y confirmar el inicio.', 'success') : ps === 'RECHAZADA' ? note('No se alcanzarán dos aprobaciones', 'En este prototipo, el equipo debe presentar una nueva propuesta.', 'warning') : note('Propuesta en revisión', 'Consulta las decisiones y corrige según el feedback antes de iniciar.'),
+        status: ps === 'APROBADA' ? note('Propuesta aprobada', hasObservation(p) ? 'Hay una observación por subsanar antes de confirmar.' : responses(p) < active(p).length ? 'Ya hay dos aprobaciones, pero falta la respuesta de todos los profesores.' : 'Todas las respuestas están registradas. El proyecto quedó pendiente de inicio. La confirmación se habilitará en el paso 4.', 'success') : ps === 'RECHAZADA' ? note('No se alcanzarán dos aprobaciones', 'En este prototipo, el equipo debe presentar una nueva propuesta.', 'warning') : note('Propuesta en revisión', 'Consulta las decisiones y corrige según el feedback antes de iniciar.'),
         edit: canEdit ? btn(p.draft ? 'Editar borrador' : 'Editar y reenviar', 'edit-proposal', p.id, 'block secondary') : '',
-        tracking: p.born ? btn('Ver seguimiento', 'project-open', p.id, 'block primary') : '',
+        tracking: db.demo !== false && p.born ? btn('Ver seguimiento', 'project-open', p.id, 'block primary') : '',
         create: ps === 'RECHAZADA' ? btn('Nueva propuesta', 'nav', 'rubrics', 'block primary') : '',
         permissions: !own(p) ? note('Vista de integrante', 'Puedes consultar el equipo, el feedback y el seguimiento. Las acciones de envío e inicio corresponden al líder.') : ''
     });
@@ -78,7 +78,7 @@ function receivedView() {
     if (!isTeacher())
         return empty('Vista de profesor', 'Selecciona un perfil de profesor para revisar propuestas.');
     const mine = db.rubrics.filter(r => r.teacher === db.profile);
-    const rows = db.proposals.filter(p => !p.draft).flatMap(p => active(p).filter(r => rubric(r.rubric).teacher === db.profile && (!listRubric || r.rubric === listRubric) && (!decisionFilter || r.decision === decisionFilter)).map(r => ({ p, r })));
+    const rows = db.proposals.filter(p => !p.draft).flatMap(p => p.relations.filter(r => rubric(r.rubric).teacher === db.profile && (!listRubric || r.rubric === listRubric) && (!decisionFilter || r.decision === decisionFilter)).map(r => ({ p, r })));
     return screen('docente/bandeja', {
         heading: head('Propuestas recibidas', 'Revisa únicamente las propuestas dirigidas a tus rúbricas.'),
         rubrics: mine.map(r => `<option value="${r.id}" ${listRubric === r.id ? 'selected' : ''}>${esc(r.title)}</option>`).join(''),
@@ -91,12 +91,12 @@ function receivedView() {
 }
 function reviewView(id, rid) {
     const p = proposal(id), r = rubric(rid), rel = p && relFor(p, rid);
-    if (!isTeacher() || !p || !rel || r.teacher !== db.profile || p.draft || rel.withdrawn)
+    if (!isTeacher() || !p || !rel || r.teacher !== db.profile || p.draft)
         return empty('Revisión no disponible', 'Solo el profesor responsable puede decidir sobre esta rúbrica.');
-    const locked = closedReview(p, rel);
+    const locked = closedReview(p, rel) || p.status === 'RECHAZADA';
     return screen('docente/revision', {
         back: icon('back'),
-        heading: head('Revisión de propuesta', p.title + ' · Enviada el ' + fmt(p.sent), pill(rel.decision)),
+        heading: head('Revisión de propuesta', p.title + ' · Versión ' + (p.contentVersion || 1) + ' · Enviada el ' + fmt(p.sent), pill(rel.decision)),
         title: esc(p.title),
         proposalIcon: icon('proposal'),
         description: esc(p.description),
@@ -114,7 +114,7 @@ function reviewView(id, rid) {
         reject: btn('Rechazo definitivo', 'decide', p.id + '|' + rid + '|RECHAZADA', 'block orange', locked),
         observations: rel.observations || 0,
         history: historyHTML(rel),
-        guidance: rel.decision === 'RECHAZADA' ? note('Rechazo definitivo', 'Esta propuesta queda cerrada para tu rúbrica.') : locked ? note(labels[rel.decision], rel.expiryReason || (rel.decision === 'OBSERVADA' ? 'A la espera de la corrección del equipo.' : 'La revisión está cerrada.')) : note('Orientar al equipo', 'El rechazo necesita feedback. La aprobación necesita fecha de inicio y fin.')
+        guidance: (db.demo === false && rel.reviewedVersion && rel.reviewedVersion !== p.contentVersion ? note('Contenido actualizado', 'La decisión anterior corresponde a la versión ' + rel.reviewedVersion + '. Ahora se muestra la versión ' + p.contentVersion + '.', 'warning') : '') + (rel.decision === 'RECHAZADA' ? note('Rechazo definitivo', 'Esta propuesta queda cerrada para tu rúbrica.') : locked ? note(labels[rel.decision], rel.expiryReason || (rel.decision === 'OBSERVADA' ? 'A la espera de la corrección del equipo.' : 'La revisión está cerrada.')) : note('Orientar al equipo', 'El rechazo necesita feedback. La aprobación necesita fecha de inicio y fin.'))
     });
 }
 export { rubricsView, proposalsView, formView, detailView, receivedView, reviewView };

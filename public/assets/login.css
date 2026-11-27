@@ -1,0 +1,78 @@
+@font-face {
+  font-family: "Open Sans";
+  src: url("./open-sans-28624.woff") format("woff");
+  font-display: swap;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: #2d7fc4;
+  color: #202124;
+  font: 15px/1.45 "Open Sans", Arial, sans-serif;
+}
+.login { width: min(100%, 440px); }
+[hidden] { display: none !important; }
+form, details { background: white; box-shadow: 0 2px 6px #153f6338; }
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 346px;
+  padding: clamp(24px, 6vw, 44px);
+}
+img { object-fit: contain; }
+h1 { margin: 14px 0 20px; font: 600 24px/1.25 "Segoe UI", Arial, sans-serif; }
+label { font-size: 13px; color: #444; }
+input {
+  width: 100%;
+  padding: 8px 0;
+  font: inherit;
+  border: 0;
+  border-bottom: 1px solid #666;
+  border-radius: 0;
+}
+input:focus { outline: none; border-color: #0067b8; box-shadow: 0 1px #0067b8; }
+input[aria-invalid="true"] { border-color: #bb172b; box-shadow: 0 1px #bb172b; }
+#accountError, #passwordError { margin: 0; font-size: 14px; color: #b11828; }
+#accountError:not(:empty) { margin-bottom: 12px; }
+#passwordForm h1 { margin-bottom: 8px; }
+#changeAccount {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  align-self: flex-start;
+  max-width: 100%;
+  margin-top: 14px;
+  padding: 3px 0;
+  border: 0;
+  background: transparent;
+  color: #253d52;
+  font: inherit;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+#changeAccount:hover { text-decoration: underline; }
+button[type="submit"] {
+  align-self: flex-end;
+  margin-top: auto;
+  position: relative;
+  top: 8px;
+  min-width: 108px;
+  padding: 8px 18px;
+  border: 0;
+  background: #0067b8;
+  color: white;
+  font: 600 14px "Segoe UI", Arial, sans-serif;
+  cursor: pointer;
+}
+button[type="submit"]:hover { background: #005799; }
+details { margin-top: 18px; }
+summary { cursor: pointer; padding: 14px clamp(24px, 6vw, 44px); }
+details p { padding: 0 clamp(24px, 6vw, 44px) 18px; margin: 0; font-size: 14px; }
+:is(button, summary):focus-visible { outline: 3px solid #193a56; outline-offset: 2px; }

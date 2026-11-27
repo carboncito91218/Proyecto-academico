@@ -16,6 +16,7 @@ function deliverablesView(p) {
 }
 function projectsView() {
     const ps = db.proposals.filter(visibleProject);
+    if (db.demo === false) return head('Proyectos pendientes', 'La confirmación y el seguimiento se habilitarán en el paso 4.') + (ps.length ? ps.map(p => `<section class="card"><h2>${esc(p.title)}</h2>${pill(p.projectStatus)}<p>Proyecto creado desde la propuesta aprobada.</p>${btn('Ver propuesta', isTeacher() ? 'review-open' : 'detail-open', isTeacher() ? p.id + '|' + p.relations.find(r => rubric(r.rubric).teacher === db.profile).rubric : p.id, 'secondary')}</section>`).join('') : empty('Todavía no hay proyectos', 'El proyecto nace con la segunda aprobación.'));
     return screen('proyectos/lista', {
         heading: head(isTeacher() ? 'Proyectos' : 'Mis proyectos', 'Elige un proyecto para consultar sus rúbricas, fechas y entregables.'),
         projects: ps.length ? `<div class="stack">${ps.map(p => `<section class="card"><div class="row wrap"><div><h2>${esc(p.title)}</h2><p class="small muted" style="margin-top:5px">Equipo de ${esc(student(p.leader).name)} · ${projectRubrics(p).length} rúbricas activas</p></div>${pill(projectState(p))}</div><div class="divider"></div><div class="row wrap"><span class="small muted">Inicio · ${fmt(dates(p).start)} &nbsp; / &nbsp; Fin · ${fmt(dates(p).end)}</span>${btn('Abrir seguimiento', 'project-open', p.id, 'primary')}</div></section>`).join('')}</div>` : empty('Todavía no hay proyectos vinculados', 'El proyecto nace cuando una propuesta alcanza al menos dos aprobaciones.')

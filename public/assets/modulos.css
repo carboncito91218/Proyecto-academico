@@ -4,6 +4,4 @@
 
 .live-session :is(#academicProfile, #profile, label[for="profile"], [data-action="scenarios"]) { display: none !important; }
 
-.live-session.development-session :is(#academicProfile, #profile, label[for="profile"]) { display: inline-block !important; }
 
-.live-session.development-session #academicProfile[hidden] { display: none !important; }

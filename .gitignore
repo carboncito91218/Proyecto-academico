@@ -17,7 +17,6 @@
 
 # Registros y respaldos de ejecución
 /storage/logs/*
-!/storage/logs/.gitkeep
 /storage/sessions/
 /database/backups/
 /database/dumps/

@@ -1,14 +1,14 @@
 <?php
 $config = require dirname(__DIR__) . '/bootstrap.php';
 try {
-    $pdo = App\Repositories\Connection::open($config['database']);
+    $pdo = App\Models\Connection::open($config['database']);
     $destination = $pdo->query('SELECT current_database(), current_user')->fetch();
     echo json_encode($destination, JSON_UNESCAPED_UNICODE) . PHP_EOL;
     if ($command === 'migrate') {
         if ($config['environment'] !== 'development' || $destination['current_database'] !== $config['database']['name'] || $destination['current_user'] !== $config['database']['user']) {
             throw new RuntimeException('Destino o entorno no autorizado para migración local.');
         }
-        (new App\Repositories\Migrator($pdo, dirname(__DIR__) . '/database/migrations'))->run();
+        (new App\Models\Migrator($pdo, dirname(__DIR__) . '/database/migrations'))->run();
     }
     if ($command === 'status') {
         if (!$pdo->query("SELECT to_regclass('public.schema_migrations')")->fetchColumn()) {

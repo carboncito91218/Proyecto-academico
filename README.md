@@ -1,104 +1,119 @@
-# ProyectoAcademicoDesarrollo
+# Proyectos académicos ISUR
 
-Módulo de proyectos académicos ISUR en PHP puro, PostgreSQL, HTML, CSS y JavaScript.
+Módulo local en PHP puro, PostgreSQL y JavaScript. Conserva el flujo de rúbricas y propuestas de los pasos 1–3, con datos académicos y acceso de demostración en PostgreSQL. La interfaz de login procede de la entrega del compañero.
 
-Esta entrega incluye la gestión de rúbricas y el catálogo con PostgreSQL, sobre la infraestructura del paso 1. La demo del equipo se abre explícitamente en demo.php.
+## Preparar y ejecutar
 
-## Abrir en Visual Studio Code
+Requiere PHP 8.1 o posterior con PDO PostgreSQL, PostgreSQL y `pg_dump` para respaldos. El navegador debe admitir módulos JavaScript.
 
-Extrae el ZIP y abre la carpeta ProyectoAcademicoDesarrollo mediante Archivo > Abrir carpeta. También puedes abrir ProyectoAcademicoDesarrollo.code-workspace.
+En una instalación nueva, crea `config/local.php` a partir de `config/local.example.php`. Configura el entorno `development`, host, puerto, base, usuario y contraseña de PostgreSQL. Define también `demo_password`, una clave local de demostración de al menos 12 caracteres que usará la semilla al crear sus cuentas. La instancia preparada durante esta actualización ya tiene esa clave definida en su archivo local privado.
 
-## Responsabilidades
+`config/local.php` está excluido de Git. El ejemplo contiene campos vacíos para las contraseñas. Las cuentas de demostración se admiten únicamente cuando el entorno es `development`.
 
-| Carpeta | Responsabilidad |
-| --- | --- |
-| app/Controllers | Recibir solicitudes HTTP, obtener la identidad del servidor y construir respuestas. |
-| app/Services | Coordinar casos de uso y transacciones: enviar, revisar, confirmar, etc. |
-| app/Domain | Entidades, reglas y estados del negocio, independientes de las vistas y del acceso concreto a datos. |
-| app/Repositories | Consultas y persistencia PostgreSQL mediante PDO; sin HTML. |
-| app/AcademicSystem | Lectura de datos académicos simulados; punto para una integración futura. |
-| app/Views | Vistas PHP agrupadas como en la entrega del frontend. |
-| public/assets | CSS, imágenes y fuentes; conserva la ruta del frontend recibido. |
-| public/src | JavaScript del frontend, con subcarpetas data y views como en la entrega. |
-| config | Configuración de aplicación y base de datos. |
-| routes | Definición de rutas HTTP. |
-| database/migrations | Cambios versionados del esquema SQL. |
-| database/seeds | Datos iniciales de desarrollo del módulo. |
-| data/academic | JSON del sistema externo simulado, consultados por PHP fuera de public. |
-| storage/logs | Registros de ejecución. |
-| tests/Unit | Pruebas de reglas y estados del negocio. |
-| tests/Integration | Pruebas de persistencia, permisos y flujos completos. |
-
-## Convenciones iniciales
-
-- public será la raíz pública del servidor.
-- Se conservan las rutas del frontend para facilitar su incorporación.
-- Las reglas y permisos definitivos se comprueban en PHP.
-- La fuente de verdad v2 rige los comportamientos; sus decisiones pendientes siguen siendo supuestos.
-- El paso 1 prepara la infraestructura. Los servicios de negocio se conectan en pasos posteriores.
-
-## Paso 1 implementado
-
-Se incorporaron las vistas y recursos entregados en la carpeta hermana `mvp academico`. La demostración se conserva en demo.php con su adaptador simulado y localStorage. El backend cuenta con arranque común, proveedor académico privado, sesión de desarrollo, conexión PDO y migraciones. El paso 2 conecta el CRUD de rúbricas.
-
-Requisitos PHP 8.1 o posterior con PDO PostgreSQL y PostgreSQL activo. Los comandos se ejecutan desde esta raíz, respetando espacios y paréntesis.
+Desde la raíz real del proyecto:
 
 ```bash
-cd '/home/manuel/Documentos/Proyecto Academico/ProyectoAcademicoDesarrollo (2)'
 php bin/check-db.php
+php bin/backup.php
 php bin/migrate.php
-php bin/migrate.php
-php bin/migrations-status.php
-php tests/Unit/run.php
-php tests/Integration/database.php
-find app config public bin tests -name '*.php' -exec php -l '{}' \;
-php -l bootstrap.php
+php bin/seed.php
 php -S 127.0.0.1:8000 -t public
 ```
 
-Configura la contraseña en `config/local.php`, campo `database.password`. El archivo ya está creado con permisos 0600 y está excluido de Git. En una copia nueva, crea ese archivo a partir de `config/local.example.php`. Nunca compartas la contraseña por chat. Host previsto 127.0.0.1, puerto 5432, base proyecto_academico y cuenta proyecto_app. La ausencia del archivo local deja el entorno en producción y deshabilita el selector.
-
-El diagnóstico muestra base y usuario reales. El migrador solo opera en development, comprueba el destino, inspecciona tablas existentes y falla sin borrar datos si requieren adaptación. El comando de integración usa transacciones revertidas para comprobar integridad y rollback. Requiere migraciones aplicadas.
-
-Abre `/dev-identity.php` para seleccionar una identidad PHP de desarrollo mediante POST con CSRF. El rol siempre procede del proveedor. El portal real y este selector comparten sesión PHP. El selector de demo.php pertenece al simulador. Las migraciones y los diagnósticos funcionan sin cookies. La autenticación institucional sigue pendiente.
-
-El backend lee `data/academic/academico.json`. La copia pública original se conserva para la demo. `ejemplos.json` permanece como ejemplo del frontend, sin importación automática en PostgreSQL. El servidor usa el reloj real y America/Lima configurable. La auditoría SQL usa UTC.
-
-Consulta `docs/ESQUEMA_BD.md`, `docs/DECISIONES_PENDIENTES.md` y `docs/VERIFICACION.md` para restricciones, supuestos y resultados de comprobación.
-
-## Paso 2 implementado
-
-Inicia el servidor con el comando anterior y abre http://127.0.0.1:8000/. Selecciona Profesor A y pulsa «Entrar al módulo». En «Mis rúbricas», crea una rúbrica con curso, título, criterios, dos competencias y plazo. Recarga para verificar que conserva sus IDs y datos. Cambia a Estudiante 01 desde el selector del portal para consultar el catálogo. Puedes filtrar por cualquier curso, incluidos los que podrá cubrir otro integrante del equipo.
-
-El catálogo se vuelve a consultar al entrar en Rúbricas y al recargar. La recepción está abierta hasta el día del plazo inclusive, siempre antes de la caducidad externa. El profesor ve también sus rúbricas vencidas. Las fechas externas proceden de `data/academic/academico.json` y el plazo individual procede de PostgreSQL.
-
-Una rúbrica con propuestas enviadas solo permite ampliar el plazo. Al eliminar con borradores vinculados, sus vínculos y sustentos se archivan en el historial antes de retirarlos. El borrador conserva contenido y equipo, con su versión incrementada. Puede quedar incompleto si era su última rúbrica. La confirmación de eliminación explica ese efecto. Los servicios registran los cambios y eliminaciones de rúbricas en `historial`.
-
-La entrada de demostración completa es http://127.0.0.1:8000/demo.php, disponible en development. Sus acciones se guardan en localStorage. El módulo real permite conservar la selección de catálogo en memoria, con aviso del paso pendiente al pulsar «Preparar propuesta». El envío y guardado de propuestas, sus revisiones, seguimiento y calendario completo corresponden a los pasos siguientes.
-
-### Comprobaciones adicionales
-
-Con las migraciones aplicadas y el servidor ejecutándose para la prueba HTTP:
+El destino previsto es `127.0.0.1:5432`, base `proyecto_academico` y usuario `proyecto_app`. El respaldo es necesario antes de actualizar una base con datos. `bin/backup.php` usa `pg_dump` y, por defecto, crea un archivo privado en el directorio temporal del sistema. Se puede indicar una ruta de destino fuera del directorio público:
 
 ```bash
-php tests/Integration/rubrics.php
-node tests/Integration/http-rubrics.mjs http://127.0.0.1:8000
+php bin/backup.php /ruta/privada/proyecto-academico.dump
 ```
 
-La prueba PHP revierte su transacción completa. La prueba HTTP usa el adaptador real y crea registros temporales, que retira junto con su historial al finalizar. Ejecútala en development con los fixtures externos de demostración (`s1`, `t1`, `t2`, `c1`, `c2`, `c3`). Requiere Node.js con fetch, Headers y Response. En este equipo el ejecutable disponible es `/usr/lib/chatgpt/resources/cua_node/bin/node`, que puede sustituir a `node` en el comando.
+El migrador inspecciona el esquema, registra cada SQL con SHA-256 y omite los ya aplicados. Las migraciones 001–004 conservan sus bytes originales. La 005 crea los catálogos, transforma los estados existentes mediante su código y añade las tablas académicas y de acceso. Los IDs, decisiones, avisos y datos históricos del módulo se conservan.
 
-### API del módulo
+La semilla es un comando explícito. El arranque del servidor y las peticiones HTTP consultan los datos preparados. Repetir la semilla conserva nombres, matrículas, hashes, contenido y plazos existentes. Cambiar `demo_password` después de crear las cuentas conserva sus hashes anteriores; ese campo es la clave de creación de cuentas nuevas y una rotación posterior debe ser explícita.
 
-Todas las rutas se sirven desde `public/` y devuelven JSON sin caché.
+Abre http://127.0.0.1:8000/. Una sesión anónima se dirige a `/login.html`. El formulario pide correo y después contraseña. El servidor verifica el hash, regenera la sesión y obtiene de ella la persona que realiza cada acción. «Cerrar sesión» envía POST con CSRF y vuelve al login.
 
-| Método y ruta | Uso |
+En Windows, instala PHP con `pdo_pgsql` y el servicio PostgreSQL. Comprueba `php -v` y `php -r "print_r(PDO::getAvailableDrivers());"`. Crea la base y cuenta locales indicadas, configura `config/local.php` y ejecuta los mismos comandos desde PowerShell. Los datos de otra instalación se transfieren mediante respaldo/restauración explícitos.
+
+## Cuentas y datos de demostración
+
+Todas las personas siguientes son ficticias. La clave común de esta instalación se obtiene localmente del campo `demo_password` de `config/local.php`. Las contraseñas y sus hashes se mantienen fuera de `public/`.
+
+| ID | Persona | Rol | Correo |
+| --- | --- | --- | --- |
+| s1 | Lucía Salazar Montes | Alumna | lucia.salazar@isur.edu.pe |
+| s2 | Mateo Rivas León | Alumno | mateo.rivas@isur.edu.pe |
+| s3 | Valeria Paredes Soto | Alumna | valeria.paredes@isur.edu.pe |
+| s4 | Diego Cárdenas Ruiz | Alumno | diego.cardenas@isur.edu.pe |
+| s5 | Camila Torres Vidal | Alumna | camila.torres@isur.edu.pe |
+| s6 | Andrés Medina Flores | Alumno | andres.medina@isur.edu.pe |
+| t1 | Elena Vargas Peña | Profesora | elena.vargas@isur.edu.pe |
+| t2 | Javier Núñez Ramos | Profesor | javier.nunez@isur.edu.pe |
+| t3 | Sofía Benavides Gil | Profesora | sofia.benavides@isur.edu.pe |
+
+Se preparan dos carreras, seis alumnos, tres docentes, cinco cursos con ciclo, matrículas y docencia por periodo. Los IDs `s1`…`s5`, `t1`…`t3` y `c1`…`c3` se mantienen. Lucía cursa Programación web y Base de datos; Mateo cursa Base de datos y Diseño de interfaces. Ambos pueden formar un equipo que cubra las tres rúbricas de ejemplo. Diego y Andrés pertenecen a Administración y permiten comprobar el filtro por carrera.
+
+Las tres rúbricas propias del módulo son Aplicación web para servicios del campus, Modelo de datos del proyecto y Experiencia de usuario del proyecto. Incluyen criterios y dos competencias cada una. Sus claves de semilla dependen del periodo. Las rúbricas anteriores siguen conservando sus IDs, contenido y plazo. Las asignaciones docente–curso se guardan como datos de demostración; la creación de rúbricas mantiene la regla vigente de validar un curso existente.
+
+Para recorrer el flujo, entra como Lucía, selecciona las rúbricas web y datos, añade a Mateo y guarda un borrador o envíalo con sus sustentos. Cierra sesión y entra como Elena para verificar competencias y observar. Vuelve como Lucía para corregir y reenviar. Elena y Javier pueden aprobar sus respectivos vínculos indicando las fechas. La segunda aprobación crea un único proyecto pendiente.
+
+## Fuente académica, periodos y estados
+
+`PostgresAcademicProvider` implementa el contrato de lectura del sistema académico. Consulta `personas`, `alumnos`, `docentes`, `carreras`, `cursos`, `periodos_academicos`, `matriculas` y `docencia_curso`. Los accesos relacionan una persona con su hash y su habilitación para desarrollo. Los servicios mantienen las validaciones de rol, carrera, matrícula y cobertura.
+
+La configuración `academic_period` selecciona de forma determinista el periodo. El preparado por defecto es `2026-2`, con inicio el 17 de agosto de 2026, caducidad el 4 de diciembre y límite de notas el 22 de diciembre. Las nuevas rúbricas de semilla reciben el 2 de diciembre como plazo. El plazo de cada rúbrica procede de PostgreSQL y es inclusivo. A las 00:00 del día de caducidad, en `America/Lima` configurable, se cierran nuevos envíos, correcciones y decisiones y se caducan los vínculos pendientes u observados con su motivo.
+
+La semilla exige fechas explícitas para un periodo distinto del predeterminado. Si las fechas existentes difieren, se detiene para conservarlas. Si los plazos de las nuevas rúbricas ya vencieron, exige elegir otro plazo o periodo. Para preparar otro periodo, elige fechas coherentes y ejecuta, por ejemplo:
+
+```bash
+php bin/seed.php --period=2027-1 --start=2027-03-15 --expiry=2027-07-02 --grades=2027-07-16 --deadline=2027-06-30
+```
+
+Después selecciona ese ID en `academic_period` de la configuración local. Esta es una elección explícita para la simulación; las fechas y rúbricas del periodo anterior se conservan. El reloj del servidor sigue siendo real.
+
+Los estados se relacionan por FK con tres catálogos independientes, `estados_propuesta`, `decisiones_rubrica` y `estados_proyecto`. Los repositorios consultan los códigos y entregan `status`, `decision` y `projectStatus` como textos estables a la interfaz. Las reglas usan los códigos. El historial mantiene sus códigos y contenido de auditoría originales.
+
+El módulo conserva los IDs externos como referencias textuales. La semilla comprueba que existan las referencias académicas anteriores y revierte si encuentra alguna pendiente de importar. Las tablas académicas tienen sus propias PK y FK. Las peticiones ordinarias solo leen estos datos desde el código; como `proyecto_app` es propietario de la base, esta separación no constituye una prohibición de escritura a nivel PostgreSQL.
+
+La copia privada `data/academic/academico.json` se conserva como fixture histórico. El módulo real utiliza PostgreSQL. La demo independiente conserva sus JSON públicos y localStorage en `/demo.php`, disponible solo con sesión y en development.
+
+## Organización
+
+| Ruta | Responsabilidad |
 | --- | --- |
-| GET api.php?op=session | Token CSRF y opciones de identidad de desarrollo. |
-| POST api.php?op=profile | `{id}` selecciona identidad de desarrollo en sesión. |
-| GET api.php?op=read | Snapshot autorizado para alumno o profesor. |
-| GET api.php?op=detail&id=UUID | Detalle de rúbrica propia o abierta para alumno. |
-| POST api.php?op=saveRubric | `{id?, title, criteria, course, competencies, deadline, version?}` crea o actualiza. `{id, remove:true, version?}` elimina. |
+| `app/Controllers` | Operaciones HTTP y snapshots autorizados. |
+| `app/Models` | Conexión, consultas, catálogos, proveedor PostgreSQL y utilidades compartidas. |
+| `app/Services` | Autenticación, reglas de rúbricas, propuestas y transacciones. |
+| `app/Views` | Plantillas visuales PHP de la entrega del equipo. |
+| `public` | Entradas web, login y recursos CSS/JavaScript/imágenes. |
+| `config` y `bootstrap.php` | Configuración privada y carga de clases. |
+| `database/migrations` | Evolución incremental del esquema. |
+| `bin` | Diagnóstico, respaldo, migración y semilla explícita. |
 
-Los POST requieren `Content-Type: application/json` y cabecera `X-CSRF-Token` obtenida de sesión. `teacher`, autor y rol enviados por el cliente se ignoran. Los errores usan 400 para JSON inválido, 401 para sesión ausente, 403 para permisos/CSRF, 404 para detalle no disponible, 409 para vínculos, bloqueo o versión obsoleta y 422 para datos inválidos. Un servicio no disponible devuelve 503 sin SQL ni secretos. El adaptador conserva `read()` y `execute()` del frontend.
+## API e identidad
 
-Este módulo local usa datos académicos externos simulados. La autenticación institucional continúa pendiente.
+Las peticiones ordinarias requieren sesión. Los POST usan un objeto JSON y la cabecera `X-CSRF-Token`. Los códigos de error distinguen sesión ausente o credenciales inválidas (401), permisos/CSRF (403), recurso no disponible (404), conflicto de versión/regla (409), validación (422) y servicio no disponible (503).
+
+| Método y operación | Finalidad |
+| --- | --- |
+| GET `api.php?op=loginToken` | Token CSRF público para el formulario de acceso. |
+| POST `api.php?op=login` | Autentica `{email,password}` y establece sesión. |
+| GET `api.php?op=session` | Perfil y CSRF de una sesión autenticada. |
+| POST `api.php?op=logout` | Cierra la sesión autenticada. |
+| GET `api.php?op=read` | Snapshot autorizado de rúbricas, propuestas y avisos. |
+| GET `api.php?op=detail&id=UUID` | Detalle autorizado de rúbrica. |
+| POST `api.php?op=saveRubric` | Crea, edita, extiende o elimina una rúbrica elegible. |
+| POST `api.php?op=candidates` | Busca integrantes elegibles por rúbricas seleccionadas. |
+| POST `api.php?op=saveProposal` | Guarda borrador, envía o corrige con versión de concurrencia. |
+| POST `api.php?op=review` | Verifica competencias o decide sobre el vínculo propio del profesor. |
+| POST `api.php?op=projectAction` | Retira un vínculo terminal con `action:'withdraw'`. |
+| POST `api.php?op=readAlerts` | Marca avisos del destinatario actual como leídos. |
+
+El autor y el rol proceden de la sesión y el proveedor. El antiguo endpoint `profile` y `dev-identity.php` quedan deshabilitados. Las sesiones del selector anterior se invalidan. Las cookies usan HttpOnly y SameSite Strict y activan Secure cuando PHP recibe HTTPS. Las cuentas sembradas tienen `solo_desarrollo` y son rechazadas en producción, incluso con una sesión anterior de desarrollo.
+
+## Reglas conservadas y siguiente paso
+
+Solo el líder edita y envía su propuesta. Se exige al menos una rúbrica para guardar borrador y dos para enviar, con equipo elegible, cobertura y sustentos. Cada profesor decide sobre su vínculo. Hay hasta dos observaciones; el reenvío conserva contador e historial y devuelve a pendiente los vínculos observados. Las aprobaciones anteriores conservan su versión revisada visible y los rechazos/caducidades permanecen terminales.
+
+La segunda aprobación crea un proyecto pendiente. La reconsideración que lo dejaría con menos de dos aprobaciones sigue bloqueada por acuerdo del usuario. Se mantienen avisos de interacción y caducidad idempotente. El proyecto permanece pendiente hasta su confirmación. En el paso 4, las transiciones por fechas deberán actualizar el estado persistido y entregar un snapshot coherente.
+
+Quedan para el paso 4 la confirmación, ejecución, evaluación, cancelación y seguimiento completo. El calendario completo, el asistente y la integración institucional continúan pendientes.

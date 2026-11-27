@@ -5,18 +5,26 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
 try {
-    session_start(['use_strict_mode'=>true,'cookie_httponly'=>true,'cookie_samesite'=>'Strict']);
-    $_SESSION['csrf'] ??= bin2hex(random_bytes(32));
+    App\Services\CurrentUser::startSession();
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && ($_GET['op'] ?? '') === 'loginToken') {
+        echo json_encode(['csrf'=>$_SESSION['csrf']]);
+        exit;
+    }
+    if (!isset($_SESSION['person_id']) && ($_GET['op'] ?? '') !== 'login') {
+        throw new App\Models\RuleViolation('Inicia sesión para continuar.',401);
+    }
     $input = [];
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $input = json_decode(file_get_contents('php://input'),true,512,JSON_THROW_ON_ERROR);
-        if (!is_array($input) || array_is_list($input)) throw new App\Domain\RuleViolation('Se requiere un objeto JSON.');
+        $body = file_get_contents('php://input');
+        $input = json_decode($body,true,512,JSON_THROW_ON_ERROR);
+        if (!is_array($input) || !str_starts_with(ltrim($body), '{')) throw new App\Models\RuleViolation('Se requiere un objeto JSON.');
     }
-    $academic = new App\AcademicSystem\JsonAcademicProvider(dirname(__DIR__) . '/data/academic/academico.json');
-    $controller = new App\Controllers\RubricController($config,$academic);
+    $pdo = App\Models\Connection::open($config['database']);
+    $academic = new App\Models\PostgresAcademicProvider($pdo,$config['academic_period']);
+    $controller = new App\Controllers\AcademicController($config,$academic,$pdo);
     $result = $controller->handle($_SERVER['REQUEST_METHOD'],$_GET,$input,$_SESSION,$_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
     echo json_encode($result,JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
-} catch (App\Domain\RuleViolation $e) {
+} catch (App\Models\RuleViolation $e) {
     http_response_code($e->status);
     echo json_encode(['error'=>$e->getMessage()],JSON_UNESCAPED_UNICODE);
 } catch (JsonException $e) {

@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 namespace App\Services;
-use App\Domain\AcademicProvider;
-use App\Domain\Id;
-use App\Domain\RuleViolation;
-use App\Repositories\RubricRepository;
+use App\Models\AcademicProvider;
+use App\Models\Id;
+use App\Models\RuleViolation;
+use App\Models\RubricRepository;
 use PDO;
 use PDOException;
 final class RubricService
@@ -37,6 +37,7 @@ final class RubricService
         if ($nested) $this->pdo->exec('SAVEPOINT rubric_save');
         else $this->pdo->beginTransaction();
         try {
+            $this->pdo->exec('SELECT pg_advisory_xact_lock(784262)');
             $before = $id === null ? null : $this->repository->get($id, true);
             if ($id !== null && !$before) throw new RuleViolation('Rúbrica inexistente.', 404);
             if ($before && $before['teacher'] !== $actor['id']) throw new RuleViolation('Rúbrica ajena a este profesor.', 403);

@@ -9,7 +9,7 @@ function academicHub() {
     const reviews = ps.flatMap(p => active(p).filter(rel => !p.draft && (faculty ? rubric(rel.rubric)?.teacher === db.profile && rel.decision === 'PENDIENTE' : rel.decision === 'OBSERVADA')).map(rel => ({ p, rel })));
     const first = reviews[0];
     const action = first ? (faculty ? 'review-open' : 'detail-open') : 'nav', id = first ? (faculty ? first.p.id + '|' + first.rel.rubric : first.p.id) : (faculty ? 'received' : 'rubrics');
-    const dates = calendarEvents().filter(e => e.day >= db.date).sort((a, b) => a.day.localeCompare(b.day)).slice(0, 3);
+    const dates = (db.demo === false ? [] : calendarEvents()).filter(e => e.day >= db.date).sort((a, b) => a.day.localeCompare(b.day)).slice(0, 3);
     const linkTile = (title, desc, dest, sym) => `<button class="hub-link" data-action="nav" data-id="${dest}"><span class="hub-icon">${icon(sym)}</span><span><strong>${title}</strong><small>${desc}</small></span>${icon('chevron')}</button>`;
     return screen('alumno/inicio', {
         campus: faculty ? 'Académico' : 'Campus virtual',
@@ -34,7 +34,7 @@ function courseCards() {
     const courses = profileCourses().filter(c => fold(c.name).includes(fold(courseDisplay.query.trim()))).sort((a, b) => a.name.localeCompare(b.name, 'es') * (courseDisplay.order === 'asc' ? 1 : -1));
     if (!courses.length)
         return empty('Sin cursos para mostrar', 'Revisa tu búsqueda o selecciona otro perfil.');
-    return `<div class="course-cards ${courseDisplay.layout === 'list' ? 'course-list' : ''}">${courses.map(c => `<button type="button" class="m-course" data-action="nav" data-id="course/${esc(c.id)}"><span aria-hidden="true" class="cover cover-${esc(c.id)}"></span><span class="m-course-copy"><strong>${esc(c.name)}</strong><small>Académico 2026-2</small></span></button>`).join('')}</div>`;
+    return `<div class="course-cards ${courseDisplay.layout === 'list' ? 'course-list' : ''}">${courses.map(c => `<button type="button" class="m-course" data-action="nav" data-id="course/${esc(c.id)}"><span aria-hidden="true" class="cover cover-${esc(c.id)}"></span><span class="m-course-copy"><strong>${esc(c.name)}</strong><small>Académico ${esc(db.periodo.id || '2026-2')}</small></span></button>`).join('')}</div>`;
 }
 function coursesPage() {
     return `<h1>Mis cursos</h1><section class="m-panel"><h2>Vista general de curso</h2><div class="m-tools"><label class="sr-only" for="campusSearch">Buscar curso</label><input id="campusSearch" type="search" placeholder="Buscar curso" value="${esc(courseDisplay.query)}"><select id="campusOrder" aria-label="Orden de los cursos"><option value="asc">Nombre de A a Z</option><option value="desc" ${courseDisplay.order === 'desc' ? 'selected' : ''}>Nombre de Z a A</option></select><select id="campusLayout" aria-label="Presentación de cursos"><option value="cards">Tarjeta</option><option value="list" ${courseDisplay.layout === 'list' ? 'selected' : ''}>Lista</option></select></div><div id="campusResults">${courseCards()}</div></section>`;
@@ -43,7 +43,7 @@ function coursePage(id) {
     const c = profileCourses().find(c => c.id === id);
     if (!c)
         return coursesPage();
-    return `${portalLink('Mis cursos', 'nav', 'courses')}<h1>${esc(c.name)}</h1><section class="m-panel"><details class="m-section" open><summary>General</summary><p>Periodo académico 2026-2</p></details><details class="m-section" open><summary>Proyectos integradores</summary><p>Consulta los criterios y plazos de las rúbricas de este curso.</p><button class="btn secondary" data-action="course-rubrics" data-id="${esc(c.id)}">Ver rúbricas del curso</button></details></section>`;
+    return `${portalLink('Mis cursos', 'nav', 'courses')}<h1>${esc(c.name)}</h1><section class="m-panel"><details class="m-section" open><summary>General</summary><p>Periodo académico ${esc(db.periodo.id || '2026-2')}</p></details><details class="m-section" open><summary>Proyectos integradores</summary><p>Consulta los criterios y plazos de las rúbricas de este curso.</p><button class="btn secondary" data-action="course-rubrics" data-id="${esc(c.id)}">Ver rúbricas del curso</button></details></section>`;
 }
 function campusOverview() {
     return `<h1>Área personal</h1><section class="m-panel"><h2>${esc(current().name)}</h2><div class="campus-shortcuts">${btn('Mis cursos', 'nav', 'courses', 'secondary')}${btn('Mis proyectos', 'nav', 'home', 'primary')}</div></section>`;

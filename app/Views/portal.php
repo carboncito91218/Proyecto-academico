@@ -46,15 +46,16 @@ $screens = [
 <button data-action="nav" data-id="home">Mis proyectos</button>
 </nav>
 <div class="top-actions">
-<span class="demo-tag"><?= !empty($demo) ? 'Demostración local' : 'Rúbricas · PostgreSQL' ?></span>
+<?php if (empty($demo)): ?><button class="btn secondary" data-action="logout">Cerrar sesión</button><?php endif; ?>
+<span class="demo-tag"><?= !empty($demo) ? 'Demostración local' : 'Proyectos · PostgreSQL' ?></span>
 <button class="academic-icon" data-action="nav" data-id="courses" title="Mis cursos" aria-label="Mis cursos" id="courseIcon">
 </button>
-<select class="profile-select actor-select" id="academicProfile" hidden aria-label="Cambiar identidad de desarrollo">
+<select class="profile-select actor-select" id="academicProfile" hidden aria-label="Perfil de demostración">
+<?php if (!empty($demo)): ?>
 <option value="s1">Alumno líder · Estudiante 01</option>
 <option value="s2">Alumno integrante · Estudiante 02</option>
-<option value="t1">Profesor A · Programación web</option>
-<option value="t2">Profesor B · Base de datos</option>
-<option value="t3">Profesor C · Interfaces</option>
+<option value="t1">Profesor A</option><option value="t2">Profesor B</option><option value="t3">Profesor C</option>
+<?php endif; ?>
 </select>
 <button class="academic-icon" id="alertBell" data-action="alerts" title="Notificaciones">
 </button>
@@ -73,13 +74,12 @@ $screens = [
 <button data-action="profile-calendar">Calendario de proyectos</button>
 <button data-action="comments">Comentarios de revisión</button>
 <button data-action="scenarios">Escenarios de prueba</button>
-<label for="profile">Identidad de desarrollo</label>
-<select class="profile-select" id="profile">
-<option value="s1">Alumno líder · Estudiante 01</option>
-<option value="s2">Alumno integrante · Estudiante 02</option>
-<option value="t1">Profesor A · Programación web</option>
-<option value="t2">Profesor B · Base de datos</option>
-<option value="t3">Profesor C · Interfaces</option>
+<?php if (!empty($demo)): ?><label for="profile">Perfil de demostración</label><?php endif; ?>
+<select class="profile-select" id="profile" <?= empty($demo) ? 'hidden' : '' ?>>
+<?php if (!empty($demo)): ?>
+<option value="s1">Alumno líder · Estudiante 01</option><option value="s2">Alumno integrante · Estudiante 02</option>
+<option value="t1">Profesor A</option><option value="t2">Profesor B</option><option value="t3">Profesor C</option>
+<?php endif; ?>
 </select>
 </div>
 </details>
